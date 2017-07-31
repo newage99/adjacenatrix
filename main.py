@@ -106,10 +106,11 @@ def create_initial_matrix():
 
     return v
 
-def fill(v,i,g):
+def fill(v,i):
 
     global n
-
+    global g
+    
     v = clean(v,i)
 
     for ii in range(i,n-1):
@@ -120,7 +121,7 @@ def fill(v,i,g):
 
             y = 0
 
-            for x in range(ii-1,0):
+            for x in range(ii-1,-1,-1):
 
                 if v[x][y] == 1:
                     
@@ -128,9 +129,14 @@ def fill(v,i,g):
                 
                 y += 1
 
-        for jj in range(c,g):
+        for jj in range(0,g-c):
 
-            #TODO
+            if jj < len(v[ii]):
+                
+                v[ii][jj] = 1
+
+    return v
+            
 
 def clean(v,i):
 
@@ -143,6 +149,18 @@ def clean(v,i):
             v[ii][j] = 0
 
     return v
+
+
+def find_hole(v):
+
+    global n
+    global g
+
+    finded = False
+
+    for i in range(n-2,-1,-1):
+
+        #TODOO
 
 
 def main():
@@ -170,13 +188,11 @@ def main():
         #CREAMOS LA MATRIZ INICIAL DE VALORES
         v = create_initial_matrix()
 
-        
+        # RELLENAMOS POR PRIMERA VEZ LA MATRIZ
+        v = fill(v,0)
 
-        create_image([[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0]])
-
-
-if __name__ == "__main__":
-    main()
+        # ENCONTRAMOS LA PRIMERA FILA QUE TENGA VALORES POR RELLENAR
+        i = find_hole(v)
 
 ##        print("[")
 ##    
@@ -193,5 +209,13 @@ if __name__ == "__main__":
 ##            print("]")
 ##
 ##        print("]")
+
+        create_image([[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0]])
+
+
+if __name__ == "__main__":
+    main()
+
+
 
 
