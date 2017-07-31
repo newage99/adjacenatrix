@@ -80,12 +80,70 @@ def create_image(info):
                             
 
                 init_pos += 1
-
             
 
     img.save("matrices_"+str(image_offset)+".png")
     img.show()
     image_offset += 1
+
+def create_initial_matrix():
+
+    global n
+
+    v = []
+    c = n-1
+    
+    for i in range(0,n-1):
+
+        vv = []
+
+        for j in range(0,c):
+
+            vv.append(1)
+
+        v.append(vv)
+        c -= 1
+
+    return v
+
+def fill(v,i,g):
+
+    global n
+
+    v = clean(v,i)
+
+    for ii in range(i,n-1):
+
+        c = 0
+
+        if ii > 0:
+
+            y = 0
+
+            for x in range(ii-1,0):
+
+                if v[x][y] == 1:
+                    
+                    c += 1
+                
+                y += 1
+
+        for jj in range(c,g):
+
+            #TODO
+
+def clean(v,i):
+
+    global n
+
+    for ii in range(i,n-1):
+
+        for j in range(0,(n-1)-ii):
+
+            v[ii][j] = 0
+
+    return v
+
 
 def main():
 
@@ -96,16 +154,21 @@ def main():
     if len(sys.argv) > 1:
 
         n = int(sys.argv[1])
-        g = int(sys.argv[2])
 
-        if n%(g+1) != 0:
-            print("It's not going to be optimal.")
+        if n > 0:
+            g = int(sys.argv[2])
 
-        x = (n/(g+1))*((g*(g+1))/2)
-        
-        ok = True
+            if n%(g+1) != 0:
+                print("It's not going to be optimal.")
+
+            x = (n/(g+1))*((g*(g+1))/2)
+            
+            ok = True
         
     if ok:
+
+        #CREAMOS LA MATRIZ INICIAL DE VALORES
+        v = create_initial_matrix()
 
         
 
@@ -114,3 +177,21 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+##        print("[")
+##    
+##        for i in range(0,len(v)):
+##
+##            sys.stdout.write('[')
+##            sys.stdout.flush()
+##            
+##            for j in range(0,len(v[i])):
+##
+##                sys.stdout.write(str(v[i][j])+',')
+##                sys.stdout.flush()
+##
+##            print("]")
+##
+##        print("]")
+
+
