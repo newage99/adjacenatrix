@@ -5,6 +5,7 @@ from PIL import Image
 image_offset = 1
 n = 0
 g = 0
+image_elements = 16
 
 def create_image(info):
 
@@ -82,9 +83,11 @@ def create_image(info):
                 init_pos += 1
             
 
-    img.save("matrices_"+str(image_offset)+".png")
-    img.show()
+    img.save("imgs/matrices_"+str(image_offset)+".png")
+    #img.show()
     image_offset += 1
+
+    return "matrices_"+str(image_offset-1)+".png"
 
 def create_initial_matrix():
 
@@ -132,8 +135,23 @@ def fill(v,i):
         for jj in range(0,g-c):
 
             if jj < len(v[ii]):
-                
-                v[ii][jj] = 1
+
+                num_of_ones = 0
+                y = jj+1
+
+                for xx in range(ii-1,-1,-1):
+
+                    if v[xx][y] == 1:
+
+                        num_of_ones += 1
+
+                    y += 1
+
+                if num_of_ones < g:                    
+                    v[ii][jj] = 1
+
+            else:
+                break
 
     return v
             
@@ -156,18 +174,114 @@ def find_hole(v):
     global n
     global g
 
-    finded = False
+    row = -1
+    col = -1
 
     for i in range(n-2,-1,-1):
 
-        #TODOO
+        zero = False
 
+        for j in range(len(v[i])-1,-1,-1):
+
+            #print(str(i)+'-'+str(j))
+
+            if zero == False:
+                
+                if v[i][j] == 0:
+                    
+                    zero = True
+
+            else:
+
+                if v[i][j] == 1:
+
+                    row = i
+                    col = j
+                    break
+
+        if row != -1:
+            break
+
+    return (row,col)
+
+def next_step(v):
+
+    # ENCONTRAMOS LA PRIMERA FILA QUE TENGA VALORES POR RELLENAR
+    pos = find_hole(v)
+    row = pos[0]
+    col = pos[1]
+
+    if row != -1 and col != -1:
+
+        ones = 1
+
+        if col+2 < len(v[row]):
+        
+            for i in range(col+2,len(v[row])):
+
+                if v[row][i] == 1:
+
+                    ones += 1
+
+        for i in range(col,len(v[row])):
+            v[row][i] = 0
+
+        ones_putted = 0
+
+        for i in range(col+1,len(v[row])):
+
+            num_of_ones = 0
+            y = i+1
+
+            for xx in range(row-1,-1,-1):
+
+                if v[xx][y] == 1:
+
+                    num_of_ones += 1
+
+                y += 1
+
+            if num_of_ones < g:                    
+                v[row][i] = 1
+                ones_putted += 1    
+
+            if ones_putted == ones:
+                break
+
+    return v,row
+
+def count_ones(v):
+
+    c = 0
+
+    for i in range(0,len(v)):
+
+        for j in range(0,len(v[i])):
+
+            if v[i][j] == 1:
+
+                c += 1
+
+    return c            
+
+def parse_matrix_to_list(v):
+
+    l = []
+
+    for i in range(0,len(v)):
+
+        for j in range(0,len(v[i])):
+
+            l.append(v[i][j])
+
+    return l
 
 def main():
 
     ok = False
     global n
     global g
+    global image_elements
 
     if len(sys.argv) > 1:
 
@@ -185,14 +299,41 @@ def main():
         
     if ok:
 
+        mat = []
+
         #CREAMOS LA MATRIZ INICIAL DE VALORES
         v = create_initial_matrix()
 
         # RELLENAMOS POR PRIMERA VEZ LA MATRIZ
         v = fill(v,0)
 
-        # ENCONTRAMOS LA PRIMERA FILA QUE TENGA VALORES POR RELLENAR
-        i = find_hole(v)
+        mat.append(parse_matrix_to_list(v))
+
+        while 1:
+        #for f in range(1000):
+
+            v,row = next_step(v)
+
+            if row != -1:
+
+                v = fill(v,row+1)
+
+                if count_ones(v) == x:
+
+                    mat.append(parse_matrix_to_list(v))
+
+                    if len(mat) == image_elements:
+
+                        name = create_image(mat)
+                        print("created image: "+name)
+                        mat = []
+
+            else:                
+                break
+    
+
+if __name__ == "__main__":
+    main()
 
 ##        print("[")
 ##    
@@ -210,12 +351,4 @@ def main():
 ##
 ##        print("]")
 
-        create_image([[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0]])
-
-
-if __name__ == "__main__":
-    main()
-
-
-
-
+        #create_image([[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0],[0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,0,1,1,1,0,0,1,0,1,0,0,0,1,1,1,0,0,1,0,1,0]])
